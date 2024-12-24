@@ -1,0 +1,24 @@
+{
+  "fields": [
+		{ "text": "MATEUS DOS SANTOS DE CARVALHO", "x": 590, "y": 785, "fontSize": 46 },
+		{ "text": "27/03/1998", "x": 670, "y": 845, "fontSize": 46 },
+		{ "text": "URUGUAIANA", "x": 1360, "y": 845, "fontSize": 46 },
+		{ "text": "ALESSANDRA GODOY DOS SANTOS", "x": 530, "y": 910, "fontSize": 46 },
+		{ "text": "SAMUEL ANHAIA DE CARVALHO", "x": 515, "y": 970, "fontSize": 46 },
+		{ "text": "CARPINTEIRO", "x": 450, "y": 1030, "fontSize": 46 },
+		{ "text": "042.012.600-70", "x": 330, "y": 1330, "fontSize": 46 },
+		{ "text": "RUA CAPITÃO ROMUALDO DE BARROS", "x": 494, "y": 1500, "fontSize": 46 },
+		{ "text": "997", "x": 410, "y": 1560, "fontSize": 46 },
+		{ "text": "403A", "x": 1400, "y": 1560, "fontSize": 46 },
+		{ "text": "CARVOEIRA", "x": 370, "y": 1623, "fontSize": 46 },
+		{ "text": "FLORIANÓPOLIS/SC", "x": 1320, "y": 1623, "fontSize": 46 },
+		{ "text": "88040-600", "x": 330, "y": 1680, "fontSize": 46 },
+		{ "text": "(48) 3031 3233", "x": 611, "y": 1860, "fontSize": 46 },
+		{ "text": "(48) 9 9162 9044", "x": 390, "y": 1920, "fontSize": 46 },
+		{ "text": "X", "x": 650, "y": 2143, "fontSize": 55 },
+		{ "text": "X", "x": 1342, "y": 2418, "fontSize": 55 },
+		{ "text": "MATEUS DOS SANTOS DE CARVALHO", "x": 700, "y": 2465, "fontSize": 46 },
+		{ "text": "042.012.600-70", "x": 590, "y": 2515, "fontSize": 46 },
+		{ "text": "FILHO", "x": 640, "y": 2570, "fontSize": 46 }
+	]
+}

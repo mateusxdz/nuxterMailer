@@ -1,0 +1,33 @@
+{
+  "fields": [
+		{ "text": "MATEUS DOS SANTOS DE CARVALHO", "x": 60, "y": 290, "fontSize": 40 },
+		{ "text": "042.012.600-70", "x": 1020, "y": 290, "fontSize": 40 },
+		{ "text": "P", "x": 1400, "y": 290, "fontSize": 40 },
+		{ "text": "12%", "x": 1570, "y": 290, "fontSize": 40 },
+		{ "text": "27/03/1998", "x": 1760, "y": 290, "fontSize": 40 },
+		
+		{ "text": "MATEUS DOS SANTOS DE CARVALHO", "x": 60, "y": 345, "fontSize": 40 },
+		{ "text": "042.012.600-70", "x": 1020, "y": 345, "fontSize": 40 },
+		{ "text": "P", "x": 1400, "y": 345, "fontSize": 40 },
+		{ "text": "12%", "x": 1570, "y": 345, "fontSize": 40 },
+		{ "text": "27/03/1998", "x": 1760, "y": 345, "fontSize": 40 },
+		
+		{ "text": "MATEUS DOS SANTOS DE CARVALHO", "x": 60, "y": 405, "fontSize": 40 },
+		{ "text": "042.012.600-70", "x": 1020, "y": 405, "fontSize": 40 },
+		{ "text": "P", "x": 1400, "y": 405, "fontSize": 40 },
+		{ "text": "12%", "x": 1570, "y": 405, "fontSize": 40 },
+		{ "text": "27/03/1998", "x": 1760, "y": 405, "fontSize": 40 },
+		
+		{ "text": "MATEUS DOS SANTOS DE CARVALHO", "x": 60, "y": 460, "fontSize": 40 },
+		{ "text": "042.012.600-70", "x": 1020, "y": 460, "fontSize": 40 },
+		{ "text": "P", "x": 1400, "y": 460, "fontSize": 40 },
+		{ "text": "12%", "x": 1570, "y": 460, "fontSize": 40 },
+		{ "text": "27/03/1998", "x": 1760, "y": 460, "fontSize": 40 },
+		
+		{ "text": "MATEUS DOS SANTOS DE CARVALHO", "x": 60, "y": 515, "fontSize": 40 },
+		{ "text": "042.012.600-70", "x": 1020, "y": 515, "fontSize": 40 },
+		{ "text": "P", "x": 1400, "y": 515, "fontSize": 40 },
+		{ "text": "12%", "x": 1570, "y": 515, "fontSize": 40 },
+		{ "text": "27/03/1998", "x": 1760, "y": 515, "fontSize": 40 }
+	]
+}
