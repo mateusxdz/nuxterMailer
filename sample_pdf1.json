@@ -3,7 +3,7 @@
 		{ "text": "1-2345-6", "x": 100, "y": 490, "fontSize": 52 },
 		{ "text": "BANCO DO BRASIL", "x": 580, "y": 490, "fontSize": 52 },
 		{ "text": "12.123.123/0001-12", "x": 1500, "y": 490, "fontSize": 52 },
-    { "text": "MATEUS DOS SANTOS DE CARVALHO", "x": 100, "y": 590, "fontSize": 52 },
+    	{ "text": "MATEUS DOS SANTOS DE CARVALHO", "x": 100, "y": 590, "fontSize": 52 },
 		{ "text": "27/03/1998", "x": 2100, "y": 588, "fontSize": 52 },
 		{ "text": "042.012.600-70", "x": 1687, "y": 686, "fontSize": 52 },
 		{ "text": "27", "x": 100, "y": 686, "fontSize": 52 },
