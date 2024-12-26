@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const sharp = require('sharp');
@@ -11,19 +12,21 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const PORT = process.env.PORT || 3000;
+
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'msc.mateus.santos@gmail.com',
-    pass: 'tjna lagh zwhb cyhd'
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
   },
 });
 
-app.post('/send-email', (req, res) => {
+app.post('/sulprev/send-email', (req, res) => {
   const { subject, to } = req.body;
 
-  const emailBodyPath = path.join(__dirname, 'corpoDoEmail.txt');
-  
+  const emailBodyPath = path.resolve(__dirname, 'corpoDoEmail.txt');
+
   fs.readFile(emailBodyPath, 'utf8', (err, emailBody) => {
     if (err) {
       console.error('Error reading corpoDoEmail.txt:', err);
@@ -31,15 +34,15 @@ app.post('/send-email', (req, res) => {
     }
 
     const pdfFiles = [
-      path.join(__dirname, 'output3pages.pdf')
+      path.resolve(__dirname, 'output3pages.pdf'),
     ];
 
     const mailOptions = {
-      from: 'msc.mateus.santos@gmail.com',
+      from: process.env.EMAIL_USER,
       to: to,
       subject: subject,
       text: emailBody,
-      attachments: pdfFiles.map(filePath => ({
+      attachments: pdfFiles.map((filePath) => ({
         filename: path.basename(filePath),
         path: filePath,
       })),
@@ -62,7 +65,7 @@ const processImage = async (imagePath, outputImagePath, fields, width, height) =
     <svg width="${width}" height="${height}">
       ${fields
         .map(({ text, x, y, fontSize, checkbox }) => {
-          const size = fontSize || 52; 
+          const size = fontSize || 52;
 
           if (checkbox) {
             return `<rect x="${x}" y="${y}" width="18" height="18" fill="black" stroke="black"/>`;
@@ -89,7 +92,7 @@ const convertImagesToPdf = async (imagePaths, outputPdfPath) => {
     const { width, height } = page.getSize();
     const imageWidth = width;
     const imageHeight = (image.height / image.width) * width;
-    
+
     page.drawImage(image, {
       x: 0,
       y: height - imageHeight,
@@ -102,7 +105,7 @@ const convertImagesToPdf = async (imagePaths, outputPdfPath) => {
   await fs.promises.writeFile(outputPdfPath, pdfBytes);
 };
 
-app.post('/generate-pdf', async (req, res) => {
+app.post('/sulprev/generate-pdf', async (req, res) => {
   try {
     const imagePaths1 = ['./output1.jpg', './output2.jpg', './pdf3.jpg'];
     const outputPdfPath1 = './output3pages.pdf';
@@ -123,12 +126,12 @@ app.post('/generate-pdf', async (req, res) => {
   }
 });
 
-app.post('/gen-page-1', async (req, res) => {
+app.post('/sulprev/gen-page-1', async (req, res) => {
   const { fields } = req.body;
 
   try {
-    const imagePath = './pdf1.jpg';
-    const outputImagePath = './output1.jpg';
+    const imagePath = path.resolve(__dirname, './pdf1.jpg');
+    const outputImagePath = path.resolve(__dirname, './output1.jpg');
     await processImage(imagePath, outputImagePath, fields, 2484, 3511);
 
     res.status(200).json({ message: 'Image updated successfully!', path: outputImagePath });
@@ -138,12 +141,12 @@ app.post('/gen-page-1', async (req, res) => {
   }
 });
 
-app.post('/gen-page-2', async (req, res) => {
+app.post('/sulprev/gen-page-2', async (req, res) => {
   const { fields } = req.body;
 
   try {
-    const imagePath = './pdf2.jpg';
-    const outputImagePath = './output2.jpg';
+    const imagePath = path.resolve(__dirname, './pdf2.jpg');
+    const outputImagePath = path.resolve(__dirname, './output2.jpg');
     await processImage(imagePath, outputImagePath, fields, 2484, 3511);
 
     res.status(200).json({ message: 'Image updated successfully!', path: outputImagePath });
@@ -153,12 +156,12 @@ app.post('/gen-page-2', async (req, res) => {
   }
 });
 
-app.post('/gen-page-3', async (req, res) => {
+app.post('/sulprev/gen-page-3', async (req, res) => {
   const { fields } = req.body;
 
   try {
-    const imagePath = './pdf3.jpg';
-    const outputImagePath = './output3.jpg';
+    const imagePath = path.resolve(__dirname, './pdf3.jpg');
+    const outputImagePath = path.resolve(__dirname, './output3.jpg');
     await processImage(imagePath, outputImagePath, fields, 2484, 3511);
 
     res.status(200).json({ message: 'Image updated successfully!', path: outputImagePath });
@@ -168,12 +171,12 @@ app.post('/gen-page-3', async (req, res) => {
   }
 });
 
-app.post('/gen-page-4', async (req, res) => {
+app.post('/sulprev/gen-page-4', async (req, res) => {
   const { fields } = req.body;
 
   try {
-    const imagePath = './pdf4.jpg';
-    const outputImagePath = './output4.jpg';
+    const imagePath = path.resolve(__dirname, './pdf4.jpg');
+    const outputImagePath = path.resolve(__dirname, './output4.jpg');
     await processImage(imagePath, outputImagePath, fields, 2479, 3509);
 
     res.status(200).json({ message: 'Image updated successfully!', path: outputImagePath });
@@ -183,7 +186,6 @@ app.post('/gen-page-4', async (req, res) => {
   }
 });
 
-const port = 3000;
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
