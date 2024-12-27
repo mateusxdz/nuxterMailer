@@ -73,7 +73,18 @@ app.post('/sulprev/send-email', (req, res) => {
   });
 });
 
+const ensureDirectoryExistence = (filePath) => {
+  const dirname = path.dirname(filePath);
+  if (fs.existsSync(dirname)) {
+    return true;
+  }
+  ensureDirectoryExistence(dirname);
+  fs.mkdirSync(dirname);
+};
+
 const processImage = async (imagePath, outputImagePath, fields, width, height) => {
+  ensureDirectoryExistence(outputImagePath);
+
   const image = sharp(imagePath);
 
   const svgText = `
@@ -81,11 +92,12 @@ const processImage = async (imagePath, outputImagePath, fields, width, height) =
       ${fields
       .map(({ text, x, y, fontSize, checkbox }) => {
         const size = fontSize || 52;
+        const displayText = text ?? '';
 
         if (checkbox) {
           return `<rect x="${x}" y="${y}" width="18" height="18" fill="black" stroke="black"/>`;
         }
-        return `<text x="${x}" y="${y}" font-size="${size}" fill="black" font-family="Arial">${text}</text>`;
+        return `<text x="${x}" y="${y}" font-size="${size}" fill="black" font-family="Arial">${displayText}</text>`;
       })
       .join('')}
     </svg>
