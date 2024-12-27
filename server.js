@@ -134,11 +134,11 @@ const convertImagesToPdf = async (imagePaths, outputPdfPath) => {
 
 app.post('/sulprev/generate-pdf', async (req, res) => {
   try {
-    const imagePaths1 = ['./output1.jpg', './output2.jpg', './pdf_images/pdf3.jpg'];
+    const imagePaths1 = ['./output_images/output1.jpg', './output_images/output2.jpg', './pdf_images/pdf3.jpg'];
     const outputPdfPath1 = './form1.pdf';
     await convertImagesToPdf(imagePaths1, outputPdfPath1);
 
-    const imagePaths2 = ['./output4.jpg'];
+    const imagePaths2 = ['./output_images/output4.jpg'];
     const outputPdfPath2 = './form2.pdf';
     await convertImagesToPdf(imagePaths2, outputPdfPath2);
 
