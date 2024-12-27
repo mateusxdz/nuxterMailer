@@ -23,37 +23,52 @@ const transporter = nodemailer.createTransport({
 });
 
 app.post('/sulprev/send-email', (req, res) => {
-  const { subject, to } = req.body;
-
-  const emailBodyPath = path.resolve(__dirname, 'corpoDoEmail.txt');
-
-  fs.readFile(emailBodyPath, 'utf8', (err, emailBody) => {
+  const {
+    to
+  } = req.body;
+  const emailBodyPath = path.resolve(__dirname, 'modelo_email.txt');
+  fs.readFile(emailBodyPath, 'utf8', (err, emailBodyContent) => {
     if (err) {
-      console.error('Error reading corpoDoEmail.txt:', err);
-      return res.status(500).json({ error: 'Error reading email body file.' });
+      console.error('Error reading modelo_email.txt:', err);
+      return res.status(500).json({
+        error: 'Error reading email body file.'
+      });
     }
-
-    const pdfFiles = [
-      path.resolve(__dirname, 'output3pages.pdf'),
-    ];
-
+    let emailData;
+    try {
+      emailData = JSON.parse(emailBodyContent);
+    } catch (parseErr) {
+      console.error('Error parsing modelo_email.txt:', parseErr);
+      return res.status(500).json({
+        error: 'Error parsing email body file.'
+      });
+    }
+    const {
+      subject,
+      text
+    } = emailData;
+    const pdfFiles = [path.resolve(__dirname, 'form1.pdf'), path.resolve(__dirname, 'form2.pdf'),];
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: to,
       subject: subject,
-      text: emailBody,
+      text: text,
       attachments: pdfFiles.map((filePath) => ({
         filename: path.basename(filePath),
         path: filePath,
       })),
     };
-
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         console.error('Error sending email:', error);
-        return res.status(500).json({ error: error.toString() });
+        return res.status(500).json({
+          error: error.toString()
+        });
       }
-      res.status(200).json({ message: 'Email sent successfully!', info: info });
+      res.status(200).json({
+        message: 'Email sent successfully!',
+        info: info
+      });
     });
   });
 });
@@ -64,15 +79,15 @@ const processImage = async (imagePath, outputImagePath, fields, width, height) =
   const svgText = `
     <svg width="${width}" height="${height}">
       ${fields
-        .map(({ text, x, y, fontSize, checkbox }) => {
-          const size = fontSize || 52;
+      .map(({ text, x, y, fontSize, checkbox }) => {
+        const size = fontSize || 52;
 
-          if (checkbox) {
-            return `<rect x="${x}" y="${y}" width="18" height="18" fill="black" stroke="black"/>`;
-          }
-          return `<text x="${x}" y="${y}" font-size="${size}" fill="black" font-family="Arial">${text}</text>`;
-        })
-        .join('')}
+        if (checkbox) {
+          return `<rect x="${x}" y="${y}" width="18" height="18" fill="black" stroke="black"/>`;
+        }
+        return `<text x="${x}" y="${y}" font-size="${size}" fill="black" font-family="Arial">${text}</text>`;
+      })
+      .join('')}
     </svg>
   `;
 
@@ -107,12 +122,12 @@ const convertImagesToPdf = async (imagePaths, outputPdfPath) => {
 
 app.post('/sulprev/generate-pdf', async (req, res) => {
   try {
-    const imagePaths1 = ['./output1.jpg', './output2.jpg', './pdf3.jpg'];
-    const outputPdfPath1 = './output3pages.pdf';
+    const imagePaths1 = ['./output1.jpg', './output2.jpg', './pdf_images/pdf3.jpg'];
+    const outputPdfPath1 = './form1.pdf';
     await convertImagesToPdf(imagePaths1, outputPdfPath1);
 
     const imagePaths2 = ['./output4.jpg'];
-    const outputPdfPath2 = './output1page.pdf';
+    const outputPdfPath2 = './form2.pdf';
     await convertImagesToPdf(imagePaths2, outputPdfPath2);
 
     res.status(200).json({
@@ -130,8 +145,8 @@ app.post('/sulprev/gen-page-1', async (req, res) => {
   const { fields } = req.body;
 
   try {
-    const imagePath = path.resolve(__dirname, './pdf1.jpg');
-    const outputImagePath = path.resolve(__dirname, './output1.jpg');
+    const imagePath = path.resolve(__dirname, './pdf_images/pdf1.jpg');
+    const outputImagePath = path.resolve(__dirname, './output_images/output1.jpg');
     await processImage(imagePath, outputImagePath, fields, 2484, 3511);
 
     res.status(200).json({ message: 'Image updated successfully!', path: outputImagePath });
@@ -145,8 +160,8 @@ app.post('/sulprev/gen-page-2', async (req, res) => {
   const { fields } = req.body;
 
   try {
-    const imagePath = path.resolve(__dirname, './pdf2.jpg');
-    const outputImagePath = path.resolve(__dirname, './output2.jpg');
+    const imagePath = path.resolve(__dirname, './pdf_images/pdf2.jpg');
+    const outputImagePath = path.resolve(__dirname, './output_images/output2.jpg');
     await processImage(imagePath, outputImagePath, fields, 2484, 3511);
 
     res.status(200).json({ message: 'Image updated successfully!', path: outputImagePath });
@@ -160,8 +175,8 @@ app.post('/sulprev/gen-page-3', async (req, res) => {
   const { fields } = req.body;
 
   try {
-    const imagePath = path.resolve(__dirname, './pdf3.jpg');
-    const outputImagePath = path.resolve(__dirname, './output3.jpg');
+    const imagePath = path.resolve(__dirname, './pdf_images/pdf3.jpg');
+    const outputImagePath = path.resolve(__dirname, './output_images/output3.jpg');
     await processImage(imagePath, outputImagePath, fields, 2484, 3511);
 
     res.status(200).json({ message: 'Image updated successfully!', path: outputImagePath });
@@ -175,8 +190,8 @@ app.post('/sulprev/gen-page-4', async (req, res) => {
   const { fields } = req.body;
 
   try {
-    const imagePath = path.resolve(__dirname, './pdf4.jpg');
-    const outputImagePath = path.resolve(__dirname, './output4.jpg');
+    const imagePath = path.resolve(__dirname, './pdf_images/pdf4.jpg');
+    const outputImagePath = path.resolve(__dirname, './output_images/output4.jpg');
     await processImage(imagePath, outputImagePath, fields, 2479, 3509);
 
     res.status(200).json({ message: 'Image updated successfully!', path: outputImagePath });
@@ -187,5 +202,5 @@ app.post('/sulprev/gen-page-4', async (req, res) => {
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Server is running on port ${PORT}!`);
 });

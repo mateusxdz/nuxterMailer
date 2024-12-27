@@ -1,6 +1,0 @@
-Olá,
-
-Corpo do e-mail proveniente do arquivo "corpoDoEmail.txt".
-PDF em anexo.
-
-Atenciosamente,
