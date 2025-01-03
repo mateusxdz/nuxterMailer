@@ -246,6 +246,6 @@ app.post('/sulprev/gen-page-4', async (req, res) => {
   }
 });
 
-app.listen(PORT, '44.226.145.213', () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running on port ${PORT}!`);
 });
