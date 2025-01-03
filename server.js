@@ -31,10 +31,17 @@ const dbClient = new Client({
   database: 'sulprev',
 });
 
-// Endpoint to test the database connection
-app.get('/test-db-connection', async (req, res) => {
+app.get('/sulprev/test-db-connection', async (req, res) => {
+  const testClient = new Client({
+    host: '46.202.150.172',
+    port: 5432,
+    user: 'sulprev_user',
+    password: 'Labs34673467@',
+    database: 'sulprev',
+  });
+
   try {
-    await dbClient.connect();  // Attempt to connect to the DB
+    await testClient.connect();  // Attempt to connect to the DB
     res.status(200).json({
       message: 'Successfully connected to the database!',
     });
@@ -44,7 +51,7 @@ app.get('/test-db-connection', async (req, res) => {
       error: 'Error connecting to the database: ' + error.message,
     });
   } finally {
-    await dbClient.end();  // Close the connection after test
+    await testClient.end();  // Close the connection after the test
   }
 });
 
