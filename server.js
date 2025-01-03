@@ -6,6 +6,7 @@ const nodemailer = require('nodemailer');
 const { PDFDocument } = require('pdf-lib');
 const fs = require('fs');
 const path = require('path');
+const { Client } = require('pg');
 
 const app = express();
 
@@ -20,6 +21,31 @@ const transporter = nodemailer.createTransport({
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
+});
+
+const dbClient = new Client({
+  host: '46.202.150.172',
+  port: 5432,
+  user: 'sulprev_user',
+  password: 'Labs34673467@',
+  database: 'sulprev',
+});
+
+// Endpoint to test the database connection
+app.get('/test-db-connection', async (req, res) => {
+  try {
+    await dbClient.connect();  // Attempt to connect to the DB
+    res.status(200).json({
+      message: 'Successfully connected to the database!',
+    });
+  } catch (error) {
+    console.error('Error connecting to the database:', error);
+    res.status(500).json({
+      error: 'Error connecting to the database: ' + error.message,
+    });
+  } finally {
+    await dbClient.end();  // Close the connection after test
+  }
 });
 
 app.post('/sulprev/send-email', (req, res) => {
