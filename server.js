@@ -313,7 +313,7 @@ const addDocumentToEnvelope = async (envelopeId, pdfPath) => {
     const pdfBase64 = pdfToBase64(pdfPath);
     const formattedFilename = `${filename}.pdf`; // Ensure filename ends with .pdf
     const contentBase64 = `data:application/pdf;base64,${pdfBase64}`; // Ensure correct format
-
+    console.log(pdfPath[0]);
     const response = await axios.post(
       `https://app.clicksign.com/api/v3/envelopes/${envelopeId}/documents`,
       {
