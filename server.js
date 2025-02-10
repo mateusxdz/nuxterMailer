@@ -60,6 +60,9 @@ app.get('/sulprev/test-db-connection', async (req, res) => {
 
 app.post('/sulprev/process-envelope', async (req, res) => {
   try {
+    console.log(`--------name:  ${name}!`);
+    console.log(`--------email:  ${email}!`);
+    console.log(`--------pdfPath:  ${pdfPath}!`);
     const { name, email, pdfPath } = req.body;
 
     if (!name || !email || !pdfPath) {
