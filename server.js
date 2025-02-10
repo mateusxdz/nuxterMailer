@@ -60,11 +60,10 @@ app.get('/sulprev/test-db-connection', async (req, res) => {
 
 app.post('/sulprev/process-envelope', async (req, res) => {
   try {
+    const { name, email, pdfPath } = req.body;
     console.log(`--------name:  ${name}!`);
     console.log(`--------email:  ${email}!`);
     console.log(`--------pdfPath:  ${pdfPath}!`);
-    const { name, email, pdfPath } = req.body;
-
     if (!name || !email || !pdfPath) {
       return res.status(400).json({ error: 'Missing required fields: name, email, or pdfPath' });
     }
