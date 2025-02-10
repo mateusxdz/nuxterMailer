@@ -1,4 +1,0 @@
-{
-  "subject": "SulPrev Confirmação",
-  "text": "\n\nTexto de confirmação de recebimento de e-mail.\n\n Para alterar este corpo de e-mail ou o assunto, modifique o arquivo \"modelo_email.txt\" existente no servidor.\n\nAtenciosamente,"
-}
