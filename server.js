@@ -34,8 +34,10 @@ const dbClient = new Client({
   database: 'sulprev',
 });
 
-app.get('/sulprev/test-db-connection', async (req, res) => {
-  const testClient = new Client({
+app.post('/sulprev/query-db', async (req, res) => {
+  const { query, params } = req.body; // Expects { "query": "SELECT * FROM users WHERE id = $1", "params": [1] }
+
+  const dbClient = new Client({
     host: '46.202.150.172',
     port: 5432,
     user: 'sulprev_user',
@@ -44,17 +46,14 @@ app.get('/sulprev/test-db-connection', async (req, res) => {
   });
 
   try {
-    await testClient.connect();  // Attempt to connect to the DB
-    res.status(200).json({
-      message: 'Successfully connected to the database!',
-    });
+    await dbClient.connect();
+    const result = await dbClient.query(query, params || []);
+    res.status(200).json(result.rows);
   } catch (error) {
-    console.error('Error connecting to the database:', error);
-    res.status(500).json({
-      error: 'Error connecting to the database: ' + error.message,
-    });
+    console.error('Database query error:', error);
+    res.status(500).json({ error: 'Database query failed', details: error.message });
   } finally {
-    await testClient.end();  // Close the connection after the test
+    await dbClient.end();
   }
 });
 
