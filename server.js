@@ -9,6 +9,7 @@ const { PDFDocument } = require('pdf-lib');
 const fs = require('fs');
 const path = require('path');
 const { Client } = require('pg');
+const { Pool } = require('pg');
 const moment = require('moment');
 
 const app = express();
@@ -276,7 +277,7 @@ app.post('/sulprev/save-page-1', async (req, res) => {
     const pessoaValues = [p1_nomeCompleto, p1_dataNascimento, p1_cpf, p1_sexo, 
                           p1_estadoCivil, p1_nacionalidade, p1_nomeMae, p1_nomePai, 
                           p1_numeroFilhos];
-    const pessoaResult = await db.query(pessoaQuery, pessoaValues);
+    const pessoaResult = await dbClient.query(pessoaQuery, pessoaValues);
     const pessoaId = pessoaResult.rows[0].pessoa_id;
 
     // Insert into instituidor table
@@ -285,7 +286,7 @@ app.post('/sulprev/save-page-1', async (req, res) => {
       VALUES ($1, $2) RETURNING instituidor_id
     `;
     const instituidorValues = [p1_nomeInstituidor, p1_cnpj];
-    const instituidorResult = await db.query(instituidorQuery, instituidorValues);
+    const instituidorResult = await dbClient.query(instituidorQuery, instituidorValues);
     const instituidorId = instituidorResult.rows[0].instituidor_id;
 
     // Insert into adesao table (assuming adesao table is related to pessoa and instituidor)
@@ -294,7 +295,7 @@ app.post('/sulprev/save-page-1', async (req, res) => {
       VALUES ($1, $2) RETURNING adesao_id
     `;
     const adesaoValues = [pessoaId, instituidorId];
-    await db.query(adesaoQuery, adesaoValues);
+    await dbClient.query(adesaoQuery, adesaoValues);
 
     res.status(200).json({ message: 'Page 1 data inserted successfully!' });
   } catch (error) {
@@ -315,7 +316,7 @@ app.post('/sulprev/save-page-2', async (req, res) => {
     `;
     const documentoValues = [p2_naturezaDoDocumento, p2_noDoDocumento, p2_orgaoExpedidor, 
                              p2_dataDeExpedicao];
-    const documentoResult = await db.query(documentoQuery, documentoValues);
+    const documentoResult = await dbClient.query(documentoQuery, documentoValues);
     const documentoId = documentoResult.rows[0].documento_id;
 
     // Insert into representante_legal table
@@ -324,7 +325,7 @@ app.post('/sulprev/save-page-2', async (req, res) => {
       VALUES ($1, $2) RETURNING representante_legal_id
     `;
     const representanteLegalValues = [p2_naturalidade, p2_cpfDoRepresentanteLegal];
-    await db.query(representanteLegalQuery, representanteLegalValues);
+    await dbClient.query(representanteLegalQuery, representanteLegalValues);
 
     res.status(200).json({ message: 'Page 2 data inserted successfully!' });
   } catch (error) {
@@ -349,7 +350,7 @@ app.post('/sulprev/save-page-3', async (req, res) => {
     const adesaoValues = [p3_idadeEntradaBeneficio, p3_valorContribuicaoMensal, 
                           p3_valorContribuicaoInstituidor, p3_capitalSegurado, 
                           p3_contribuicao, p3_contribuicaoTotal];
-    const adesaoResult = await db.query(adesaoQuery, adesaoValues);
+    const adesaoResult = await dbClient.query(adesaoQuery, adesaoValues);
     const adesaoId = adesaoResult.rows[0].adesao_id;
 
     // Insert into representante_legal table
@@ -359,7 +360,7 @@ app.post('/sulprev/save-page-3', async (req, res) => {
     `;
     const representanteLegalValues = [p3_nomeRepresentanteLegal, p3_filiacao, 
                                       p3_cpfDoRepresentanteLegal, adesaoId];
-    await db.query(representanteLegalQuery, representanteLegalValues);
+    await dbClient.query(representanteLegalQuery, representanteLegalValues);
 
     res.status(200).json({ message: 'Page 3 data inserted successfully!' });
   } catch (error) {
@@ -386,7 +387,7 @@ app.post('/sulprev/save-page-5', async (req, res) => {
                           p5_bairro, p5_cidade, p5_dddETelefoneFixo, p5_dddETelefoneCelular, 
                           p5_justifique, p5_residenteBrasil === 'true', p5_pessoaExposta === 'true', 
                           req.body.p1_cpf];
-    await db.query(pessoaQuery, pessoaValues);
+    await dbClient.query(pessoaQuery, pessoaValues);
 
     res.status(200).json({ message: 'Page 5 data inserted successfully!' });
   } catch (error) {
@@ -408,7 +409,7 @@ app.post('/sulprev/save-page-6', async (req, res) => {
       WHERE pessoa_id = (SELECT pessoa_id FROM pessoa WHERE cpf = $2)
     `;
     const adesaoValues = [p6_selectedRegime, req.body.p1_cpf];
-    await db.query(adesaoQuery, adesaoValues);
+    await dbClient.query(adesaoQuery, adesaoValues);
 
     // Insert into declaracao table
     const declaracaoQuery = `
@@ -418,7 +419,7 @@ app.post('/sulprev/save-page-6', async (req, res) => {
     `;
     const declaracaoValues = [adesaoId, p6_selectedSecondRegime, p6_vinculadoAoSegurado, 
                               p6_cpfDoSegurado, p6_grauDeParentesco];
-    await db.query(declaracaoQuery, declaracaoValues);
+    await dbClient.query(declaracaoQuery, declaracaoValues);
 
     res.status(200).json({ message: 'Page 6 data inserted successfully!' });
   } catch (error) {
