@@ -262,6 +262,39 @@ app.post('/sulprev/gen-page-4', async (req, res) => {
   }
 });
 
+app.post('/sulprev/charge-user', async (req, res) => {
+    const { correlationID, value, name, email, phone, taxID } = req.body;
+    
+    try {
+        const openPixResponse = await axios.post('https://api.openpix.com.br/api/openpix/v1/charge', {
+            correlationID,
+            value,
+            customer: { name, email, phone, taxID }
+        }, {
+            headers: {
+                Authorization: process.env.OPENPIX_AUTHORIZATION, // Use environment variable for API key
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const charge = openPixResponse.data.charge;
+
+        res.status(200).json({
+            value: charge.value,
+            identifier: charge.identifier,
+            status: charge.status,
+            brCode: charge.brCode,
+            pixKey: charge.pixKey,
+            paymentLinkUrl: charge.paymentLinkUrl,
+            qrCodeImage: charge.qrCodeImage,
+            globalID: charge.globalID
+        });
+    } catch (error) {
+        console.error("Error creating charge:", error.response?.data || error.message);
+        res.status(500).json({ error: "Failed to create charge", details: error.response?.data || error.message });
+    }
+});
+
 const createEnvelope = async () => {
   try {
     const now = new Date();
