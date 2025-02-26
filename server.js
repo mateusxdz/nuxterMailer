@@ -261,6 +261,172 @@ app.post('/sulprev/gen-page-4', async (req, res) => {
   }
 });
 
+app.post('/sulprev/save-page-1', async (req, res) => {
+  const { p1_nomeCompleto, p1_dataNascimento, p1_cpf, p1_sexo, p1_estadoCivil, 
+          p1_nacionalidade, p1_nomeMae, p1_nomePai, p1_numeroFilhos, 
+          p1_nomeInstituidor, p1_cnpj, p1_numeroInstituidor } = req.body;
+
+  try {
+    // Insert into pessoa table
+    const pessoaQuery = `
+      INSERT INTO pessoa (nome_completo, data_nascimento, cpf, sexo, estado_civil, 
+                          nacionalidade, nome_mae, nome_pai, numero_filhos) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING pessoa_id
+    `;
+    const pessoaValues = [p1_nomeCompleto, p1_dataNascimento, p1_cpf, p1_sexo, 
+                          p1_estadoCivil, p1_nacionalidade, p1_nomeMae, p1_nomePai, 
+                          p1_numeroFilhos];
+    const pessoaResult = await db.query(pessoaQuery, pessoaValues);
+    const pessoaId = pessoaResult.rows[0].pessoa_id;
+
+    // Insert into instituidor table
+    const instituidorQuery = `
+      INSERT INTO instituidor (nome, cnpj) 
+      VALUES ($1, $2) RETURNING instituidor_id
+    `;
+    const instituidorValues = [p1_nomeInstituidor, p1_cnpj];
+    const instituidorResult = await db.query(instituidorQuery, instituidorValues);
+    const instituidorId = instituidorResult.rows[0].instituidor_id;
+
+    // Insert into adesao table (assuming adesao table is related to pessoa and instituidor)
+    const adesaoQuery = `
+      INSERT INTO adesao (pessoa_id, instituidor_id) 
+      VALUES ($1, $2) RETURNING adesao_id
+    `;
+    const adesaoValues = [pessoaId, instituidorId];
+    await db.query(adesaoQuery, adesaoValues);
+
+    res.status(200).json({ message: 'Page 1 data inserted successfully!' });
+  } catch (error) {
+    console.error('Error inserting page 1 data:', error);
+    res.status(500).json({ error: error.toString() });
+  }
+});
+
+app.post('/sulprev/save-page-2', async (req, res) => {
+  const { p2_naturezaDoDocumento, p2_noDoDocumento, p2_orgaoExpedidor, p2_dataDeExpedicao, 
+          p2_naturalidade, p2_cpfDoRepresentanteLegal } = req.body;
+
+  try {
+    // Insert into documento table
+    const documentoQuery = `
+      INSERT INTO documento (natureza, numero, orgao_expedidor, data_expedicao) 
+      VALUES ($1, $2, $3, $4) RETURNING documento_id
+    `;
+    const documentoValues = [p2_naturezaDoDocumento, p2_noDoDocumento, p2_orgaoExpedidor, 
+                             p2_dataDeExpedicao];
+    const documentoResult = await db.query(documentoQuery, documentoValues);
+    const documentoId = documentoResult.rows[0].documento_id;
+
+    // Insert into representante_legal table
+    const representanteLegalQuery = `
+      INSERT INTO representante_legal (nome_completo, cpf) 
+      VALUES ($1, $2) RETURNING representante_legal_id
+    `;
+    const representanteLegalValues = [p2_naturalidade, p2_cpfDoRepresentanteLegal];
+    await db.query(representanteLegalQuery, representanteLegalValues);
+
+    res.status(200).json({ message: 'Page 2 data inserted successfully!' });
+  } catch (error) {
+    console.error('Error inserting page 2 data:', error);
+    res.status(500).json({ error: error.toString() });
+  }
+});
+
+app.post('/sulprev/save-page-3', async (req, res) => {
+  const { p3_nomeRepresentanteLegal, p3_filiacao, p3_naturalidade, p3_cpfDoRepresentanteLegal, 
+          p3_idadeEntradaBeneficio, p3_valorContribuicaoMensal, p3_valorContribuicaoInstituidor, 
+          p3_capitalSegurado, p3_contribuicao, p3_contribuicaoTotal } = req.body;
+
+  try {
+    // Insert into adesao table
+    const adesaoQuery = `
+      INSERT INTO adesao (idade_entrada_beneficio, valor_contribuicao_mensal, 
+                          valor_contribuicao_instituidor, capital_segurado, 
+                          contribuicao_participante, contribuicao_total) 
+      VALUES ($1, $2, $3, $4, $5, $6) RETURNING adesao_id
+    `;
+    const adesaoValues = [p3_idadeEntradaBeneficio, p3_valorContribuicaoMensal, 
+                          p3_valorContribuicaoInstituidor, p3_capitalSegurado, 
+                          p3_contribuicao, p3_contribuicaoTotal];
+    const adesaoResult = await db.query(adesaoQuery, adesaoValues);
+    const adesaoId = adesaoResult.rows[0].adesao_id;
+
+    // Insert into representante_legal table
+    const representanteLegalQuery = `
+      INSERT INTO representante_legal (nome_completo, filiacao, cpf, adesao_id) 
+      VALUES ($1, $2, $3, $4) RETURNING representante_legal_id
+    `;
+    const representanteLegalValues = [p3_nomeRepresentanteLegal, p3_filiacao, 
+                                      p3_cpfDoRepresentanteLegal, adesaoId];
+    await db.query(representanteLegalQuery, representanteLegalValues);
+
+    res.status(200).json({ message: 'Page 3 data inserted successfully!' });
+  } catch (error) {
+    console.error('Error inserting page 3 data:', error);
+    res.status(500).json({ error: error.toString() });
+  }
+});
+
+app.post('/sulprev/save-page-5', async (req, res) => {
+  const { p5_cep, p5_enderecoResidencial, p5_uf, p5_numero, p5_complemento, p5_bairro, 
+          p5_cidade, p5_dddETelefoneFixo, p5_dddETelefoneCelular, p5_justifique, 
+          p5_residenteBrasil, p5_pessoaExposta } = req.body;
+
+  try {
+    // Insert into pessoa table (additional fields)
+    const pessoaQuery = `
+      UPDATE pessoa
+      SET cep = $1, endereco_residencial = $2, uf = $3, numero = $4, complemento = $5, 
+          bairro = $6, cidade = $7, ddd_telefone_fixo = $8, ddd_telefone_celular = $9, 
+          justificativa_exposicao = $10, residente_brasil = $11, pessoa_politicamente_exposta = $12
+      WHERE cpf = $13
+    `;
+    const pessoaValues = [p5_cep, p5_enderecoResidencial, p5_uf, p5_numero, p5_complemento, 
+                          p5_bairro, p5_cidade, p5_dddETelefoneFixo, p5_dddETelefoneCelular, 
+                          p5_justifique, p5_residenteBrasil === 'true', p5_pessoaExposta === 'true', 
+                          req.body.p1_cpf];
+    await db.query(pessoaQuery, pessoaValues);
+
+    res.status(200).json({ message: 'Page 5 data inserted successfully!' });
+  } catch (error) {
+    console.error('Error inserting page 5 data:', error);
+    res.status(500).json({ error: error.toString() });
+  }
+});
+
+app.post('/sulprev/save-page-6', async (req, res) => {
+  const { p6_ocupacaoPrincipal, p6_estadoCivil, p6_categoria, p6_obrigacoesFiscais, 
+          p6_residenteBrasil, p6_selectedRegime, p6_selectedSecondRegime, 
+          p6_vinculadoAoSegurado, p6_cpfDoSegurado, p6_grauDeParentesco } = req.body;
+
+  try {
+    // Insert into adesao table
+    const adesaoQuery = `
+      UPDATE adesao
+      SET regime_previdencia = $1
+      WHERE pessoa_id = (SELECT pessoa_id FROM pessoa WHERE cpf = $2)
+    `;
+    const adesaoValues = [p6_selectedRegime, req.body.p1_cpf];
+    await db.query(adesaoQuery, adesaoValues);
+
+    // Insert into declaracao table
+    const declaracaoQuery = `
+      INSERT INTO declaracao (adesao_id, regime_previdencia, vinculado_ao_segurado, 
+                              cpf_segurado, grau_parentesco) 
+      VALUES ($1, $2, $3, $4, $5)
+    `;
+    const declaracaoValues = [adesaoId, p6_selectedSecondRegime, p6_vinculadoAoSegurado, 
+                              p6_cpfDoSegurado, p6_grauDeParentesco];
+    await db.query(declaracaoQuery, declaracaoValues);
+
+    res.status(200).json({ message: 'Page 6 data inserted successfully!' });
+  } catch (error) {
+    console.error('Error inserting page 6 data:', error);
+    res.status(500).json({ error: error.toString() });
+  }
+});
+
 app.post('/sulprev/charge-user', async (req, res) => {
     const { correlationID, value, name, email, phone, taxID } = req.body;
     
