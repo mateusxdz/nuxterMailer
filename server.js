@@ -209,17 +209,10 @@ app.post('/sulprev/simulate-previdencia', async (req, res) => {
     `;
 
     // Check if dbClient is already connected
-    let isConnected = false;
-    try {
-      await dbClient.query('SELECT 1;'); // Test if the connection is active
-      isConnected = true;
-    } catch (err) {
-      console.log('Database connection lost. Reconnecting...');
-    }
-
-    if (!isConnected) {
+    if (!dbClient._connected) {
+      console.log('Database is not connected. Connecting now...');
       await dbClient.connect();
-      console.log('Database reconnected successfully.');
+      console.log('Database connected successfully.');
     }
 
     // Execute the query
@@ -320,9 +313,9 @@ app.post('/sulprev/gen-page-4', async (req, res) => {
 });
 
 app.post('/sulprev/save-page-1', async (req, res) => {
-  const { p1_nomeCompleto, p1_dataNascimento, p1_cpf, p1_sexo, p1_estadoCivil, 
-          p1_nacionalidade, p1_nomeMae, p1_nomePai, p1_numeroFilhos, 
-          p1_nomeInstituidor, p1_cnpj, p1_numeroInstituidor } = req.body;
+  const { p1_nomeCompleto, p1_dataNascimento, p1_cpf, p1_sexo, p1_estadoCivil,
+    p1_nacionalidade, p1_nomeMae, p1_nomePai, p1_numeroFilhos,
+    p1_nomeInstituidor, p1_cnpj, p1_numeroInstituidor } = req.body;
 
   try {
     // Insert into pessoa table
@@ -331,9 +324,9 @@ app.post('/sulprev/save-page-1', async (req, res) => {
                           nacionalidade, nome_mae, nome_pai, numero_filhos) 
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING pessoa_id
     `;
-    const pessoaValues = [p1_nomeCompleto, p1_dataNascimento, p1_cpf, p1_sexo, 
-                          p1_estadoCivil, p1_nacionalidade, p1_nomeMae, p1_nomePai, 
-                          p1_numeroFilhos];
+    const pessoaValues = [p1_nomeCompleto, p1_dataNascimento, p1_cpf, p1_sexo,
+      p1_estadoCivil, p1_nacionalidade, p1_nomeMae, p1_nomePai,
+      p1_numeroFilhos];
     const pessoaResult = await dbClient.query(pessoaQuery, pessoaValues);
     const pessoaId = pessoaResult.rows[0].pessoa_id;
 
@@ -362,8 +355,8 @@ app.post('/sulprev/save-page-1', async (req, res) => {
 });
 
 app.post('/sulprev/save-page-2', async (req, res) => {
-  const { p2_naturezaDoDocumento, p2_noDoDocumento, p2_orgaoExpedidor, p2_dataDeExpedicao, 
-          p2_naturalidade, p2_cpfDoRepresentanteLegal } = req.body;
+  const { p2_naturezaDoDocumento, p2_noDoDocumento, p2_orgaoExpedidor, p2_dataDeExpedicao,
+    p2_naturalidade, p2_cpfDoRepresentanteLegal } = req.body;
 
   try {
     // Insert into documento table
@@ -371,8 +364,8 @@ app.post('/sulprev/save-page-2', async (req, res) => {
       INSERT INTO documento (natureza, numero, orgao_expedidor, data_expedicao) 
       VALUES ($1, $2, $3, $4) RETURNING documento_id
     `;
-    const documentoValues = [p2_naturezaDoDocumento, p2_noDoDocumento, p2_orgaoExpedidor, 
-                             p2_dataDeExpedicao];
+    const documentoValues = [p2_naturezaDoDocumento, p2_noDoDocumento, p2_orgaoExpedidor,
+      p2_dataDeExpedicao];
     const documentoResult = await dbClient.query(documentoQuery, documentoValues);
     const documentoId = documentoResult.rows[0].documento_id;
 
@@ -392,9 +385,9 @@ app.post('/sulprev/save-page-2', async (req, res) => {
 });
 
 app.post('/sulprev/save-page-3', async (req, res) => {
-  const { p3_nomeRepresentanteLegal, p3_filiacao, p3_naturalidade, p3_cpfDoRepresentanteLegal, 
-          p3_idadeEntradaBeneficio, p3_valorContribuicaoMensal, p3_valorContribuicaoInstituidor, 
-          p3_capitalSegurado, p3_contribuicao, p3_contribuicaoTotal } = req.body;
+  const { p3_nomeRepresentanteLegal, p3_filiacao, p3_naturalidade, p3_cpfDoRepresentanteLegal,
+    p3_idadeEntradaBeneficio, p3_valorContribuicaoMensal, p3_valorContribuicaoInstituidor,
+    p3_capitalSegurado, p3_contribuicao, p3_contribuicaoTotal } = req.body;
 
   try {
     // Insert into adesao table
@@ -404,9 +397,9 @@ app.post('/sulprev/save-page-3', async (req, res) => {
                           contribuicao_participante, contribuicao_total) 
       VALUES ($1, $2, $3, $4, $5, $6) RETURNING adesao_id
     `;
-    const adesaoValues = [p3_idadeEntradaBeneficio, p3_valorContribuicaoMensal, 
-                          p3_valorContribuicaoInstituidor, p3_capitalSegurado, 
-                          p3_contribuicao, p3_contribuicaoTotal];
+    const adesaoValues = [p3_idadeEntradaBeneficio, p3_valorContribuicaoMensal,
+      p3_valorContribuicaoInstituidor, p3_capitalSegurado,
+      p3_contribuicao, p3_contribuicaoTotal];
     const adesaoResult = await dbClient.query(adesaoQuery, adesaoValues);
     const adesaoId = adesaoResult.rows[0].adesao_id;
 
@@ -415,8 +408,8 @@ app.post('/sulprev/save-page-3', async (req, res) => {
       INSERT INTO representante_legal (nome_completo, filiacao, cpf, adesao_id) 
       VALUES ($1, $2, $3, $4) RETURNING representante_legal_id
     `;
-    const representanteLegalValues = [p3_nomeRepresentanteLegal, p3_filiacao, 
-                                      p3_cpfDoRepresentanteLegal, adesaoId];
+    const representanteLegalValues = [p3_nomeRepresentanteLegal, p3_filiacao,
+      p3_cpfDoRepresentanteLegal, adesaoId];
     await dbClient.query(representanteLegalQuery, representanteLegalValues);
 
     res.status(200).json({ message: 'Page 3 data inserted successfully!' });
@@ -427,9 +420,9 @@ app.post('/sulprev/save-page-3', async (req, res) => {
 });
 
 app.post('/sulprev/save-page-5', async (req, res) => {
-  const { p5_cep, p5_enderecoResidencial, p5_uf, p5_numero, p5_complemento, p5_bairro, 
-          p5_cidade, p5_dddETelefoneFixo, p5_dddETelefoneCelular, p5_justifique, 
-          p5_residenteBrasil, p5_pessoaExposta } = req.body;
+  const { p5_cep, p5_enderecoResidencial, p5_uf, p5_numero, p5_complemento, p5_bairro,
+    p5_cidade, p5_dddETelefoneFixo, p5_dddETelefoneCelular, p5_justifique,
+    p5_residenteBrasil, p5_pessoaExposta } = req.body;
 
   try {
     // Insert into pessoa table (additional fields)
@@ -440,10 +433,10 @@ app.post('/sulprev/save-page-5', async (req, res) => {
           justificativa_exposicao = $10, residente_brasil = $11, pessoa_politicamente_exposta = $12
       WHERE cpf = $13
     `;
-    const pessoaValues = [p5_cep, p5_enderecoResidencial, p5_uf, p5_numero, p5_complemento, 
-                          p5_bairro, p5_cidade, p5_dddETelefoneFixo, p5_dddETelefoneCelular, 
-                          p5_justifique, p5_residenteBrasil === 'true', p5_pessoaExposta === 'true', 
-                          req.body.p1_cpf];
+    const pessoaValues = [p5_cep, p5_enderecoResidencial, p5_uf, p5_numero, p5_complemento,
+      p5_bairro, p5_cidade, p5_dddETelefoneFixo, p5_dddETelefoneCelular,
+      p5_justifique, p5_residenteBrasil === 'true', p5_pessoaExposta === 'true',
+      req.body.p1_cpf];
     await dbClient.query(pessoaQuery, pessoaValues);
 
     res.status(200).json({ message: 'Page 5 data inserted successfully!' });
@@ -454,9 +447,9 @@ app.post('/sulprev/save-page-5', async (req, res) => {
 });
 
 app.post('/sulprev/save-page-6', async (req, res) => {
-  const { p6_ocupacaoPrincipal, p6_estadoCivil, p6_categoria, p6_obrigacoesFiscais, 
-          p6_residenteBrasil, p6_selectedRegime, p6_selectedSecondRegime, 
-          p6_vinculadoAoSegurado, p6_cpfDoSegurado, p6_grauDeParentesco } = req.body;
+  const { p6_ocupacaoPrincipal, p6_estadoCivil, p6_categoria, p6_obrigacoesFiscais,
+    p6_residenteBrasil, p6_selectedRegime, p6_selectedSecondRegime,
+    p6_vinculadoAoSegurado, p6_cpfDoSegurado, p6_grauDeParentesco } = req.body;
 
   try {
     // Insert into adesao table
@@ -474,8 +467,8 @@ app.post('/sulprev/save-page-6', async (req, res) => {
                               cpf_segurado, grau_parentesco) 
       VALUES ($1, $2, $3, $4, $5)
     `;
-    const declaracaoValues = [adesaoId, p6_selectedSecondRegime, p6_vinculadoAoSegurado, 
-                              p6_cpfDoSegurado, p6_grauDeParentesco];
+    const declaracaoValues = [adesaoId, p6_selectedSecondRegime, p6_vinculadoAoSegurado,
+      p6_cpfDoSegurado, p6_grauDeParentesco];
     await dbClient.query(declaracaoQuery, declaracaoValues);
 
     res.status(200).json({ message: 'Page 6 data inserted successfully!' });
@@ -486,36 +479,36 @@ app.post('/sulprev/save-page-6', async (req, res) => {
 });
 
 app.post('/sulprev/charge-user', async (req, res) => {
-    const { correlationID, value, name, email, phone, taxID } = req.body;
-    
-    try {
-        const openPixResponse = await axios.post('https://api.openpix.com.br/api/openpix/v1/charge', {
-            correlationID,
-            value,
-            customer: { name, email, phone, taxID }
-        }, {
-            headers: {
-                Authorization: process.env.OPENPIX_AUTHORIZATION, // Use environment variable for API key
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        const charge = openPixResponse.data.charge;
+  const { correlationID, value, name, email, phone, taxID } = req.body;
 
-        res.status(200).json({
-            value: charge.value,
-            identifier: charge.identifier,
-            status: charge.status,
-            brCode: charge.brCode,
-            pixKey: charge.pixKey,
-            paymentLinkUrl: charge.paymentLinkUrl,
-            qrCodeImage: charge.qrCodeImage,
-            globalID: charge.globalID
-        });
-    } catch (error) {
-        console.error("Error creating charge:", error.response?.data || error.message);
-        res.status(500).json({ error: "Failed to create charge", details: error.response?.data || error.message });
-    }
+  try {
+    const openPixResponse = await axios.post('https://api.openpix.com.br/api/openpix/v1/charge', {
+      correlationID,
+      value,
+      customer: { name, email, phone, taxID }
+    }, {
+      headers: {
+        Authorization: process.env.OPENPIX_AUTHORIZATION, // Use environment variable for API key
+        'Content-Type': 'application/json'
+      }
+    });
+
+    const charge = openPixResponse.data.charge;
+
+    res.status(200).json({
+      value: charge.value,
+      identifier: charge.identifier,
+      status: charge.status,
+      brCode: charge.brCode,
+      pixKey: charge.pixKey,
+      paymentLinkUrl: charge.paymentLinkUrl,
+      qrCodeImage: charge.qrCodeImage,
+      globalID: charge.globalID
+    });
+  } catch (error) {
+    console.error("Error creating charge:", error.response?.data || error.message);
+    res.status(500).json({ error: "Failed to create charge", details: error.response?.data || error.message });
+  }
 });
 
 const createEnvelope = async () => {
@@ -553,7 +546,7 @@ const createEnvelope = async () => {
 
     // Extract and return the first "id" field
     const envelopeId = response.data?.data?.id;
-    
+
     if (!envelopeId) {
       throw new Error('Envelope ID not found in response');
     }
