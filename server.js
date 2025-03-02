@@ -39,14 +39,6 @@ const dbClient = new Client({
 app.post('/sulprev/query-db', async (req, res) => {
   const { query, params } = req.body; // Expects { "query": "SELECT * FROM users WHERE id = $1", "params": [1] }
 
-  const dbClient = new Client({
-    host: '46.202.150.172',
-    port: 5432,
-    user: 'sulprev_user',
-    password: 'Labs34673467@',
-    database: 'sulprev',
-  });
-
   try {
     await dbClient.connect();
     const result = await dbClient.query(query, params || []);
@@ -221,6 +213,7 @@ app.post('/sulprev/simulate-previdencia', async (req, res) => {
     `;
 
     // Execute the query
+    await dbClient.connect();
     const result = await dbClient.query(query, queryParams);
     console.log('Query result:', result.rows); // Log query result
 
