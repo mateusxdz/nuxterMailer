@@ -179,6 +179,60 @@ const convertImagesToPdf = async (imagePaths, outputPdfPath) => {
   await fs.promises.writeFile(outputPdfPath, pdfBytes);
 };
 
+app.post('/sulprev/simulate-previdencia', async (req, res) => {
+  const {
+    contribuicao_mensal,
+    idade_inicio_beneficio,
+    aporte_inicial,
+    modalidade,
+    percentual_saldo,
+    prazo_determinado,
+    expectativa_vida,
+    rentabilidade_anual = 0.08, // Default value for rentabilidade_anual
+    taxa_administracao_anual = 0.0045 // Default value for taxa_administracao_anual
+  } = req.body;
+
+  try {
+    // Validate inputs
+    if (!contribuicao_mensal || !idade_inicio_beneficio || !aporte_inicial || !modalidade) {
+      return res.status(400).json({ error: 'Missing required parameters' });
+    }
+
+    // Prepare query parameters
+    const queryParams = [
+      contribuicao_mensal,
+      idade_inicio_beneficio,
+      aporte_inicial,
+      modalidade,
+      percentual_saldo || null, // if null, send null to DB
+      prazo_determinado || null, // if null, send null to DB
+      expectativa_vida || null, // if null, send null to DB
+      rentabilidade_anual,
+      taxa_administracao_anual
+    ];
+
+    // SQL query
+    const query = `
+      SELECT * 
+      FROM simular_previdencia(
+        $1, $2, $3, $4, $5, $6, $7, $8, $9
+      );
+    `;
+
+    // Execute the query
+    const result = await dbClient.query(query, queryParams);
+
+    // Send the response with the result
+    res.status(200).json({
+      message: 'Simulation completed successfully',
+      data: result.rows
+    });
+  } catch (error) {
+    console.error('Error executing SQL query:', error);
+    res.status(500).json({ error: error.toString() });
+  }
+});
+
 app.post('/sulprev/generate-pdf', async (req, res) => {
   try {
     const timestamp = moment().format('YYYYMMDD_HHmmss');
