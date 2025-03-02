@@ -33,6 +33,7 @@ const dbClient = new Client({
   user: 'sulprev_user',
   password: 'Labs34673467@',
   database: 'sulprev',
+  statement_timeout: 50000,
 });
 
 app.post('/sulprev/query-db', async (req, res) => {
@@ -187,9 +188,7 @@ app.post('/sulprev/simulate-previdencia', async (req, res) => {
     modalidade,
     percentual_saldo,
     prazo_determinado,
-    expectativa_vida,
-    rentabilidade_anual = 0.08,
-    taxa_administracao_anual = 0.0045
+    expectativa_vida
   } = req.body;
 
   console.log('Received request with parameters:', req.body); // Log the request body
@@ -208,9 +207,7 @@ app.post('/sulprev/simulate-previdencia', async (req, res) => {
       modalidade,
       percentual_saldo || null,
       prazo_determinado || null,
-      expectativa_vida || null,
-      rentabilidade_anual,
-      taxa_administracao_anual
+      expectativa_vida || null
     ];
 
     console.log('Query parameters:', queryParams); // Log the query parameters
@@ -219,7 +216,7 @@ app.post('/sulprev/simulate-previdencia', async (req, res) => {
     const query = `
       SELECT * 
       FROM simular_previdencia(
-        $1, $2, $3, $4, $5, $6, $7, $8, $9
+        $1, $2, $3, $4, $5, $6, $7
       );
     `;
 
