@@ -188,9 +188,11 @@ app.post('/sulprev/simulate-previdencia', async (req, res) => {
     percentual_saldo,
     prazo_determinado,
     expectativa_vida,
-    rentabilidade_anual = 0.08, // Default value for rentabilidade_anual
-    taxa_administracao_anual = 0.0045 // Default value for taxa_administracao_anual
+    rentabilidade_anual = 0.08,
+    taxa_administracao_anual = 0.0045
   } = req.body;
+
+  console.log('Received request with parameters:', req.body); // Log the request body
 
   try {
     // Validate inputs
@@ -204,12 +206,14 @@ app.post('/sulprev/simulate-previdencia', async (req, res) => {
       idade_inicio_beneficio,
       aporte_inicial,
       modalidade,
-      percentual_saldo || null, // if null, send null to DB
-      prazo_determinado || null, // if null, send null to DB
-      expectativa_vida || null, // if null, send null to DB
+      percentual_saldo || null,
+      prazo_determinado || null,
+      expectativa_vida || null,
       rentabilidade_anual,
       taxa_administracao_anual
     ];
+
+    console.log('Query parameters:', queryParams); // Log the query parameters
 
     // SQL query
     const query = `
@@ -221,6 +225,7 @@ app.post('/sulprev/simulate-previdencia', async (req, res) => {
 
     // Execute the query
     const result = await dbClient.query(query, queryParams);
+    console.log('Query result:', result.rows); // Log query result
 
     // Send the response with the result
     res.status(200).json({
