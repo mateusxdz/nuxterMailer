@@ -183,8 +183,6 @@ app.post('/sulprev/simulate-previdencia', async (req, res) => {
     expectativa_vida
   } = req.body;
 
-  console.log('Received request with parameters:', req.body); // Log the request body
-
   try {
     // Validate inputs
     if (!contribuicao_mensal || !idade_inicio_beneficio || !aporte_inicial || !modalidade) {
@@ -202,8 +200,6 @@ app.post('/sulprev/simulate-previdencia', async (req, res) => {
       expectativa_vida || null
     ];
 
-    console.log('Query parameters:', queryParams); // Log the query parameters
-
     // SQL query
     const query = `
       SELECT * 
@@ -212,10 +208,22 @@ app.post('/sulprev/simulate-previdencia', async (req, res) => {
       );
     `;
 
+    // Check if dbClient is already connected
+    let isConnected = false;
+    try {
+      await dbClient.query('SELECT 1;'); // Test if the connection is active
+      isConnected = true;
+    } catch (err) {
+      console.log('Database connection lost. Reconnecting...');
+    }
+
+    if (!isConnected) {
+      await dbClient.connect();
+      console.log('Database reconnected successfully.');
+    }
+
     // Execute the query
-    await dbClient.connect();
     const result = await dbClient.query(query, queryParams);
-    console.log('Query result:', result.rows); // Log query result
 
     // Send the response with the result
     res.status(200).json({
