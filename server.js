@@ -208,12 +208,7 @@ app.post('/sulprev/simulate-previdencia', async (req, res) => {
       );
     `;
 
-    // Check if dbClient is already connected
-    if (!dbClient._connected) {
-      console.log('Database is not connected. Connecting now...');
-      await dbClient.connect();
-      console.log('Database connected successfully.');
-    }
+    await dbClient.connect();
 
     // Execute the query
     const result = await dbClient.query(query, queryParams);
@@ -226,6 +221,9 @@ app.post('/sulprev/simulate-previdencia', async (req, res) => {
   } catch (error) {
     console.error('Error executing SQL query:', error);
     res.status(500).json({ error: error.toString() });
+  }
+  finally {
+    await dbClient.end();
   }
 });
 
