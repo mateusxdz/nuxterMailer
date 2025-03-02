@@ -37,7 +37,7 @@ const dbClient = new Client({
 });
 
 app.post('/sulprev/query-db', async (req, res) => {
-  const { query, params } = req.body; // Expects { "query": "SELECT * FROM users WHERE id = $1", "params": [1] }
+  const { query, params } = req.body;
 
   try {
     await dbClient.connect();
@@ -47,7 +47,11 @@ app.post('/sulprev/query-db', async (req, res) => {
     console.error('Database query error:', error);
     res.status(500).json({ error: 'Database query failed', details: error.message });
   } finally {
-    await dbClient.end();
+    try {
+      await dbClient.end();
+    } catch (endError) {
+      console.error('Error closing DB connection:', endError);
+    }
   }
 });
 
@@ -221,9 +225,12 @@ app.post('/sulprev/simulate-previdencia', async (req, res) => {
   } catch (error) {
     console.error('Error executing SQL query:', error);
     res.status(500).json({ error: error.toString() });
-  }
-  finally {
-    await dbClient.end();
+  } finally {
+    try {
+      await dbClient.end();
+    } catch (endError) {
+      console.error('Error closing DB connection:', endError);
+    }
   }
 });
 
