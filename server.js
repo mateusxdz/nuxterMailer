@@ -27,21 +27,22 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const dbClient = new Client({
+const pool = new Pool({
   host: '46.202.150.172',
   port: 5432,
   user: 'sulprev_user',
   password: 'Labs34673467@',
   database: 'sulprev',
-  statement_timeout: 50000,
+  max: 10, // Maximum number of connections in the pool
+  idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
+  connectionTimeoutMillis: 2000, // Return error if connection takes longer than 2s
 });
 
 app.post('/sulprev/query-db', async (req, res) => {
   const { query, params } = req.body;
 
   try {
-    await dbClient.connect();
-    const result = await dbClient.query(query, params || []);
+    const result = await pool.query(query, params || []);
     res.status(200).json(result.rows);
   } catch (error) {
     console.error('Database query error:', error);
@@ -212,10 +213,7 @@ app.post('/sulprev/simulate-previdencia', async (req, res) => {
       );
     `;
 
-    await dbClient.connect();
-
-    // Execute the query
-    const result = await dbClient.query(query, queryParams);
+    const result = await pool.query(query, queryParams || []);
 
     // Send the response with the result
     res.status(200).json({
